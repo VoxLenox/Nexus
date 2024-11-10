@@ -573,6 +573,7 @@ Library.isNaN = isNaN
 Library.deepCloneTable = deepCloneTable
 Library.load = load
 
+Library.RobloxTopBarSubMenu = RobloxTopBarSubMenu
 Library.RobloxTopBarSubMenuButton = RobloxTopBarSubMenuButton
 
 return Library
