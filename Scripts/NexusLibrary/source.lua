@@ -15,6 +15,7 @@ export type Descriptors = {[any]: {
 -- [[ Services ]] --
 
 local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
 
 -- [[ Script: Core Functions ]] --
 
@@ -86,6 +87,36 @@ local function findFirstChild(startChild: Instance, ...: string): Instance?
 	return child
 end
 
+local function makeDraggable(guiObject: GuiObject)
+	local dragging: boolean
+	local dragInput: InputObject
+	local dragStart: Vector3
+	local startPosition: UDim2
+	guiObject.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPosition = guiObject.Position
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+	guiObject.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+	UserInputService.InputChanged:Connect(function(input)
+		if dragging and input == dragInput then
+			local delta = input.Position - dragStart
+			guiObject.Position = UDim2.new(startPosition.X.Scale, startPosition.X.Offset + delta.X, startPosition.Y.Scale, startPosition.Y.Offset + delta.Y)
+		end
+	end)
+end
+
 -- [[ Exporting ]] --
 
 Library.createProxyWithPropertyDescriptors = createProxyWithPropertyDescriptors
@@ -93,5 +124,6 @@ Library.toBoolean = toBoolean
 Library.isNaN = isNaN
 Library.deepCloneTable = deepCloneTable
 Library.load = load
+Library.makeDraggable = makeDraggable
 
 return Library
